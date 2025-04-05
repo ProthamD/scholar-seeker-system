@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarIcon, DollarSign, Users, ExternalLink } from "lucide-react";
+import { CalendarIcon, DollarSign, Users, ExternalLink, BookOpen, Home } from "lucide-react";
 import { toast } from "sonner";
 
 // Type definition for scholarship data
@@ -15,12 +15,14 @@ export interface Scholarship {
   amount: string;
   deadline: string;
   eligibility: string;
+  educationLevel?: string;
+  incomeRequired?: string;
   category: string;
   description?: string;
   link?: string;
 }
 
-// Mock scholarship data - would be replaced with API calls
+// Enhanced mock scholarship data with education levels and income requirements
 const mockScholarships: Scholarship[] = [
   {
     id: 1,
@@ -29,6 +31,8 @@ const mockScholarships: Scholarship[] = [
     amount: "₹50,000",
     deadline: "October 15, 2025",
     eligibility: "High academic achievement, PSAT/NMSQT test scores",
+    educationLevel: "undergraduate",
+    incomeRequired: "any",
     category: "Merit-based",
     link: "#"
   },
@@ -39,6 +43,8 @@ const mockScholarships: Scholarship[] = [
     amount: "₹75,000",
     deadline: "December 1, 2025",
     eligibility: "Engineering majors, minimum 3.5 GPA",
+    educationLevel: "undergraduate",
+    incomeRequired: "any",
     category: "Field-specific",
     link: "#"
   },
@@ -49,6 +55,8 @@ const mockScholarships: Scholarship[] = [
     amount: "₹45,000",
     deadline: "January 15, 2026",
     eligibility: "First-generation college students, demonstrated financial need",
+    educationLevel: "undergraduate",
+    incomeRequired: "low",
     category: "Need-based",
     link: "#"
   },
@@ -59,6 +67,8 @@ const mockScholarships: Scholarship[] = [
     amount: "₹100,000",
     deadline: "November 30, 2025",
     eligibility: "Female students pursuing degrees in Science, Technology, Engineering, or Mathematics",
+    educationLevel: "undergraduate",
+    incomeRequired: "any",
     category: "Diversity",
     link: "#"
   },
@@ -69,6 +79,8 @@ const mockScholarships: Scholarship[] = [
     amount: "₹35,000",
     deadline: "February 28, 2026",
     eligibility: "Students with significant community service experience, minimum 3.0 GPA",
+    educationLevel: "high school",
+    incomeRequired: "middle",
     category: "Service-based",
     link: "#"
   },
@@ -79,6 +91,8 @@ const mockScholarships: Scholarship[] = [
     amount: "₹60,000",
     deadline: "March 15, 2026",
     eligibility: "Students from rural communities with financial need",
+    educationLevel: "undergraduate",
+    incomeRequired: "low",
     category: "Need-based",
     link: "#"
   },
@@ -89,6 +103,8 @@ const mockScholarships: Scholarship[] = [
     amount: "₹40,000",
     deadline: "December 15, 2025",
     eligibility: "Students pursuing visual arts, performing arts, creative writing, or related fields",
+    educationLevel: "postgraduate",
+    incomeRequired: "any",
     category: "Field-specific",
     link: "#"
   },
@@ -99,7 +115,33 @@ const mockScholarships: Scholarship[] = [
     amount: "₹55,000",
     deadline: "January 30, 2026",
     eligibility: "Business majors with entrepreneurial projects or plans",
+    educationLevel: "postgraduate",
+    incomeRequired: "any",
     category: "Field-specific",
+    link: "#"
+  },
+  {
+    id: 9,
+    name: "Doctoral Research Fellowship",
+    provider: "National Research Foundation",
+    amount: "₹125,000",
+    deadline: "November 15, 2025",
+    eligibility: "PhD candidates with innovative research proposals",
+    educationLevel: "phd",
+    incomeRequired: "any",
+    category: "Research-based",
+    link: "#"
+  },
+  {
+    id: 10,
+    name: "Low-Income Achievement Scholarship",
+    provider: "Equal Opportunity Foundation",
+    amount: "₹80,000",
+    deadline: "October 30, 2025",
+    eligibility: "Students from low-income families with high academic achievement",
+    educationLevel: "undergraduate",
+    incomeRequired: "low",
+    category: "Need-based",
     link: "#"
   }
 ];
@@ -116,28 +158,41 @@ const ScholarshipList = () => {
         // Simulating API call with setTimeout
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Filter logic based on search params
+        // Extract filter parameters
         const query = searchParams.get("q")?.toLowerCase() || "";
         const community = searchParams.get("community")?.toLowerCase() || "";
         const education = searchParams.get("education")?.toLowerCase() || "";
+        const income = searchParams.get("income")?.toLowerCase() || "";
         const maxAmount = parseInt(searchParams.get("maxAmount") || "100000");
         
+        console.log("Filtering with:", { query, community, education, income, maxAmount });
+        
+        // Apply filters
         const filtered = mockScholarships.filter(scholarship => {
+          // Text search filter
           const matchesQuery = !query || 
             scholarship.name.toLowerCase().includes(query) || 
             scholarship.provider.toLowerCase().includes(query) ||
             scholarship.eligibility.toLowerCase().includes(query);
           
+          // Community filter
           const matchesCommunity = !community || 
             scholarship.eligibility.toLowerCase().includes(community);
           
+          // Education level filter - now directly matching the educationLevel property
           const matchesEducation = !education || 
-            scholarship.eligibility.toLowerCase().includes(education);
+            scholarship.educationLevel === education;
           
+          // Income level filter - now directly matching the incomeRequired property
+          const matchesIncome = !income || 
+            scholarship.incomeRequired === income || 
+            scholarship.incomeRequired === "any";
+          
+          // Amount filter
           const scholarshipAmount = parseInt(scholarship.amount.replace(/[^0-9]/g, ""));
           const matchesAmount = !maxAmount || scholarshipAmount <= maxAmount;
           
-          return matchesQuery && matchesCommunity && matchesEducation && matchesAmount;
+          return matchesQuery && matchesCommunity && matchesEducation && matchesIncome && matchesAmount;
         });
         
         setScholarships(filtered);
@@ -223,6 +278,20 @@ const ScholarshipList = () => {
             <div className="flex items-start text-sm">
               <Users className="h-4 w-4 mr-2 text-blue-500 mt-0.5" />
               <span>{scholarship.eligibility}</span>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {scholarship.educationLevel && (
+                <div className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                  <BookOpen className="h-3 w-3 mr-1" />
+                  {scholarship.educationLevel.charAt(0).toUpperCase() + scholarship.educationLevel.slice(1)}
+                </div>
+              )}
+              {scholarship.incomeRequired && scholarship.incomeRequired !== "any" && (
+                <div className="inline-flex items-center px-2 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full">
+                  <Home className="h-3 w-3 mr-1" />
+                  {scholarship.incomeRequired.charAt(0).toUpperCase() + scholarship.incomeRequired.slice(1)} Income
+                </div>
+              )}
             </div>
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row gap-3">

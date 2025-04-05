@@ -6,7 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Search, Filter, X } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
 
 const SearchForm = () => {
   const [searchParams] = useSearchParams();
@@ -16,6 +20,7 @@ const SearchForm = () => {
   const [community, setCommunity] = useState(searchParams.get("community") || "");
   const [educationLevel, setEducationLevel] = useState(searchParams.get("education") || "");
   const [maxAmount, setMaxAmount] = useState(parseInt(searchParams.get("maxAmount") || "100000"));
+  const [incomeLevel, setIncomeLevel] = useState(searchParams.get("income") || "");
   const [showFilters, setShowFilters] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -26,6 +31,7 @@ const SearchForm = () => {
     if (community) params.append("community", community);
     if (educationLevel) params.append("education", educationLevel);
     if (maxAmount !== 100000) params.append("maxAmount", maxAmount.toString());
+    if (incomeLevel) params.append("income", incomeLevel);
     
     navigate(`/search?${params.toString()}`);
   };
@@ -35,6 +41,7 @@ const SearchForm = () => {
     setCommunity("");
     setEducationLevel("");
     setMaxAmount(100000);
+    setIncomeLevel("");
     navigate("/search");
   };
 
@@ -108,6 +115,21 @@ const SearchForm = () => {
                   <SelectItem value="postgraduate">Postgraduate</SelectItem>
                   <SelectItem value="phd">PhD</SelectItem>
                   <SelectItem value="high school">High School</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="income">Income Level</Label>
+              <Select value={incomeLevel} onValueChange={setIncomeLevel}>
+                <SelectTrigger id="income">
+                  <SelectValue placeholder="Select income level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="low">Low Income (Below ₹3L)</SelectItem>
+                  <SelectItem value="middle">Middle Income (₹3L - ₹10L)</SelectItem>
+                  <SelectItem value="high">High Income (Above ₹10L)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
