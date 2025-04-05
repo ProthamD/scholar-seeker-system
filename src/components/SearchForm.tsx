@@ -17,10 +17,10 @@ const SearchForm = () => {
   const navigate = useNavigate();
   
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
-  const [community, setCommunity] = useState(searchParams.get("community") || "");
-  const [educationLevel, setEducationLevel] = useState(searchParams.get("education") || "");
+  const [community, setCommunity] = useState(searchParams.get("community") || "any");
+  const [educationLevel, setEducationLevel] = useState(searchParams.get("education") || "any");
   const [maxAmount, setMaxAmount] = useState(parseInt(searchParams.get("maxAmount") || "100000"));
-  const [incomeLevel, setIncomeLevel] = useState(searchParams.get("income") || "");
+  const [incomeLevel, setIncomeLevel] = useState(searchParams.get("income") || "any");
   const [showFilters, setShowFilters] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -28,20 +28,20 @@ const SearchForm = () => {
     
     const params = new URLSearchParams();
     if (searchQuery) params.append("q", searchQuery);
-    if (community) params.append("community", community);
-    if (educationLevel) params.append("education", educationLevel);
+    if (community !== "any") params.append("community", community);
+    if (educationLevel !== "any") params.append("education", educationLevel);
     if (maxAmount !== 100000) params.append("maxAmount", maxAmount.toString());
-    if (incomeLevel) params.append("income", incomeLevel);
+    if (incomeLevel !== "any") params.append("income", incomeLevel);
     
     navigate(`/search?${params.toString()}`);
   };
 
   const clearFilters = () => {
     setSearchQuery("");
-    setCommunity("");
-    setEducationLevel("");
+    setCommunity("any");
+    setEducationLevel("any");
     setMaxAmount(100000);
-    setIncomeLevel("");
+    setIncomeLevel("any");
     navigate("/search");
   };
 
@@ -93,7 +93,7 @@ const SearchForm = () => {
                   <SelectValue placeholder="Select community" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="any">Any</SelectItem>
                   <SelectItem value="sc">SC</SelectItem>
                   <SelectItem value="st">ST</SelectItem>
                   <SelectItem value="obc">OBC</SelectItem>
@@ -110,7 +110,7 @@ const SearchForm = () => {
                   <SelectValue placeholder="Select education level" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="any">Any</SelectItem>
                   <SelectItem value="undergraduate">Undergraduate</SelectItem>
                   <SelectItem value="postgraduate">Postgraduate</SelectItem>
                   <SelectItem value="phd">PhD</SelectItem>
@@ -126,7 +126,7 @@ const SearchForm = () => {
                   <SelectValue placeholder="Select income level" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="any">Any</SelectItem>
                   <SelectItem value="low">Low Income (Below ₹3L)</SelectItem>
                   <SelectItem value="middle">Middle Income (₹3L - ₹10L)</SelectItem>
                   <SelectItem value="high">High Income (Above ₹10L)</SelectItem>

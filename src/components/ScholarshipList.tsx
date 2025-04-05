@@ -176,15 +176,15 @@ const ScholarshipList = () => {
             scholarship.eligibility.toLowerCase().includes(query);
           
           // Community filter
-          const matchesCommunity = !community || 
+          const matchesCommunity = !community || community === "any" || 
             scholarship.eligibility.toLowerCase().includes(community);
           
-          // Education level filter - now directly matching the educationLevel property
-          const matchesEducation = !education || 
+          // Education level filter
+          const matchesEducation = !education || education === "any" || 
             scholarship.educationLevel === education;
           
-          // Income level filter - now directly matching the incomeRequired property
-          const matchesIncome = !income || 
+          // Income level filter
+          const matchesIncome = !income || income === "any" || 
             scholarship.incomeRequired === income || 
             scholarship.incomeRequired === "any";
           
